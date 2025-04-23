@@ -5,83 +5,84 @@ Smart Shape Analysis from Segmented Images
 ContourIQ is a modular, AI-assisted pipeline that analyzes object contours from segmented images to extract meaningful insights — including object type classification (e.g. man-made vs. natural) and structural features like fractures, shape complexity, and geometry. Built for flexibility, precision, and scalability.
 
 
-## Explanation
+# ContourIQ: Key Contour Features Explained
 
- Breakdown of each of the key contour features used in ContourIQ and their scientific meaning and why they matter for object classification:
-### 1. Area
+ContourIQ uses a variety of scientifically grounded shape features to classify and understand object contours extracted from segmented images. Here's a breakdown of the key features and why each matters in real-world object classification.
 
-#### Definition: Total number of pixels inside the contour.
+---
 
-#### Why it matters: Gives a sense of object size. Very small areas may be noise; large ones are likely full objects.
+## 🔹 1. Area
+- **Definition:** Total number of pixels inside the contour.
+- **Why it matters:** Provides object size. Very small areas might be noise; large ones are typically full objects.
 
-🔹 2. Perimeter
+---
 
-    Definition: Total length of the contour's outline.
+## 🔹 2. Perimeter
+- **Definition:** Total length of the contour's boundary.
+- **Why it matters:** Used alongside area to assess shape smoothness. Jagged or complex shapes have longer perimeters.
 
-    Why it matters: Used with area to derive shape descriptors like circularity. Irregular or jagged shapes have longer perimeters.
+---
 
-🔹 3. Circularity
+## 🔹 3. Circularity
+- **Formula:** \( \frac{4 \cdot \pi \cdot \text{Area}}{\text{Perimeter}^2} \)
+- **Range:** [0, 1], with 1 representing a perfect circle.
+- **Why it matters:** Distinguishes round objects (e.g., wheels, balls) from angular or irregular ones.
 
-    Formula: (4⋅π⋅Area)/Perimeter2(4⋅π⋅Area)/Perimeter2
+---
 
-    Range: [0, 1], where 1 = perfect circle
+## 🔹 4. Aspect Ratio
+- **Formula:** Width / Height of the bounding box.
+- **Why it matters:** High ratios indicate elongated objects like sticks or rods.
 
-    Why it matters: Helps distinguish round, smooth shapes from angular or elongated ones. Useful for detecting wheels, balls, etc.
+---
 
-🔹 4. Aspect Ratio
+## 🔹 5. Extent
+- **Formula:** \( \frac{\text{Area}}{\text{Bounding Box Area}} \)
+- **Why it matters:** Indicates how fully the object occupies its bounding box. Low extent often points to sparse or odd shapes.
 
-    Formula: width / height of bounding rectangle
+---
 
-    Why it matters: High values (e.g., >2 or <0.5) often indicate elongated objects like sticks, poles, or rods.
+## 🔹 6. Solidity
+- **Formula:** \( \frac{\text{Area}}{\text{Convex Hull Area}} \)
+- **Why it matters:** Measures convexity. Lower values suggest more indentations or hollow regions—useful for detecting fractures.
 
-🔹 5. Extent
+---
 
-    Formula: Area/(Bounding Box Area)Area/(Bounding Box Area)
+## 🔹 7. Eccentricity
+- **Formula:** \( \sqrt{1 - (b/a)^2} \) where \( a = \) major axis and \( b = \) minor axis
+- **Range:** 0 (circle) to 1 (line)
+- **Why it matters:** High eccentricity values indicate very elongated objects—like pipes or beams.
 
-    Why it matters: Measures how much of the bounding box the object fills. Low extent → sparse or oddly shaped object.
+---
 
-🔹 6. Solidity
+## 🔹 8. Skeleton Length
+- **Definition:** Total number of pixels in the skeletonized version of the object.
+- **Why it matters:** A proxy for shape complexity or length. Long skeletons are characteristic of wires, cords, or branches.
 
-    Formula: Area/Convex Hull AreaArea/Convex Hull Area
+---
 
-    Why it matters: Measures shape regularity. Perfectly convex = 1. Low solidity = jagged or hollow shapes → good fracture indicator.
+## 🔹 9. Hu Moments (1–7)
+- **Definition:** A set of seven invariant shape descriptors.
+- **Why it matters:** Remain stable under scaling, translation, and rotation—ideal for comparing and matching complex shapes.
 
-🔹 7. Eccentricity
+---
 
-    Formula: 1−(b/a)21−(b/a)2
+## 🔹 10. Convexity Defects
+- **Definition:** Points where the contour deviates inward from its convex hull.
+- **Why it matters:** More defects suggest irregular or broken surfaces—important for fracture detection.
 
-    ​ where a = major axis, b = minor axis
+---
 
-    Range: 0 (circle) to 1 (line)
+## 🔹 11. Number of Corners
+- **Definition:** Number of points in a simplified polygonal contour.
+- **Why it matters:** Helps distinguish regular (e.g., square) from irregular or organic shapes.
 
-    Why it matters: High eccentricity means very elongated → useful to catch pipes, bars, beams, etc.
+---
 
-🔹 8. Skeleton Length
+## 🔹 12. Fourier Descriptor (First Harmonic Magnitude)
+- **Definition:** Strength of the first frequency component in the Fourier transform of the contour.
+- **Why it matters:** A low magnitude typically indicates a regular, smooth outline. High values imply jagged or noisy shapes.
 
-    Definition: Number of foreground pixels in the skeletonized shape.
+---
 
-    Why it matters: Good proxy for object complexity and length. Long skeletons = wires, ropes, etc.
-
-🔹 9. Hu Moments (1–7)
-
-    Definition: Set of 7 numbers derived from image moments, invariant to scale, rotation, and translation.
-
-    Why it matters: Powerful for general shape comparison, especially in model-based matching.
-
-🔹 10. Convexity Defects
-
-    Definition: Deep indentations from the convex hull.
-
-    Why it matters: More defects → more "fractured" or irregular. Great for detecting broken objects or natural debris.
-
-🔹 11. Number of Corners
-
-    Definition: Count of points in the polygonal approximation of the contour.
-
-    Why it matters: Regular shapes (like boxes) have few corners. A high number often signals natural or deformed objects.
-
-🔹 12. Fourier Descriptor (First Harmonic Magnitude)
-
-    Definition: Strength of the first frequency component in the shape's Fourier transform.
-
-    Why it matters: Low values → smooth, regular shapes. High values → irregular outlines.
+These features form the foundation of ContourIQ's shape intelligence pipeline, powering object classification from raw segmentation data with precision and interpretability.
