@@ -1,0 +1,55 @@
+services:
+  # computing unit
+  contourIQ:
+    shm_size: '2gb'
+    image: tannousgeagea/contouriq:ubuntu.20.04-cuda.11.5.2
+    container_name: contourIQ
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    build:
+      context: .
+      args:
+        user: ${user}
+        userid: ${userid}
+        group: ${group}
+        groupid: ${groupid}
+    networks:
+      - internal
+    env_file: .env
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    working_dir: /home/$user/src
+    volumes:
+      - .:/home/$user/src
+      - ${MEDIA_ROOT}:/media
+    user: ${user}
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+
+  postgres:
+    image: postgres:latest
+    container_name: contourIQ-postgres
+    env_file: .env
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    networks:
+     - internal
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+networks:
+  internal:
+    driver: bridge 
+
+volumes:
+  postgres_data:
