@@ -8,11 +8,11 @@ ContourIQ is a modular, AI-assisted pipeline that analyzes object contours from 
 ## Explanation
 
  Breakdown of each of the key contour features used in ContourIQ and their scientific meaning and why they matter for object classification:
-🔹 1. Area
+### 1. Area
 
-    Definition: Total number of pixels inside the contour.
+#### Definition: Total number of pixels inside the contour.
 
-    Why it matters: Gives a sense of object size. Very small areas may be noise; large ones are likely full objects.
+#### Why it matters: Gives a sense of object size. Very small areas may be noise; large ones are likely full objects.
 
 🔹 2. Perimeter
 
