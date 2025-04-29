@@ -54,7 +54,9 @@ def extract_shape_features(contour: np.ndarray, mask_shape: tuple = None) -> Dic
     if len(contour) >= 5:
         try:
             _, (MA, ma), _ = cv2.fitEllipse(contour)
-            features["eccentricity"] = np.sqrt(1 - (ma / MA) ** 2) if MA > 0 else 0
+            a = max(MA, ma) / 2
+            b = min(MA, ma) / 2
+            features["eccentricity"] = np.sqrt(1 - (b**2 / a**2)) if MA > 0 else 0
         except:
             features["eccentricity"] = 0
 

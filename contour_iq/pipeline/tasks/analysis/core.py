@@ -10,7 +10,12 @@ def analyze_contour(features: Dict[str, float]) -> Dict[str, bool]:
     """
     attributes = {
         "is_man_made": False,
-        "fracture_detected": False
+        "fracture_detected": False,
+        "long_object": False,
+        "round_object": False,
+        "compact_object": False,
+        "long_skeleton": False,
+        "rigid_object": False,
     }
 
     # Heuristic for man-made object:
@@ -25,7 +30,6 @@ def analyze_contour(features: Dict[str, float]) -> Dict[str, bool]:
     ):
         attributes["is_man_made"] = True
 
-    # Heuristic for fracture detection:
     if (
         features.get("num_defects", 0) > 5 or
         features.get("num_corners", 0) > 10 or
@@ -41,9 +45,8 @@ def analyze_contour(features: Dict[str, float]) -> Dict[str, bool]:
     ):
         attributes["long_object"] = True
 
-    # Round object (wheel, ball)
     if (
-        features.get("circularity", 0) > 0.85 and
+        features.get("circularity", 0) > 0.65 and
         features.get("eccentricity", 0) < 0.6 and
         features.get("solidity", 0) > 0.9
     ):
@@ -63,5 +66,10 @@ def analyze_contour(features: Dict[str, float]) -> Dict[str, bool]:
         (features.get("area", 0) / max(features.get("skeleton_length", 1), 1)) < 3
     ):
         attributes["long_skeleton"] = True
+
+    attributes["rigid_object"] = (
+        (features.get("solidity") > 0.85 and features.get("extent") > 0.85 and features.get("num_defects") <= 2) or
+        (features.get("eccentricity", 0) > 0.98 and attributes['long_object'] and features.get("skeleton_length", 0) > 300)
+    )
 
     return attributes
