@@ -49,7 +49,7 @@ ContourIQ uses a variety of scientifically grounded shape features to classify a
 ---
 
 ## 🔹 7. Eccentricity
-- **Formula:** $\sqrt{1 - (b/a)^2}$ where $ a = $ major axis and $ b = $ minor axis
+- **Formula:** $\sqrt{1 - (b/a)^2}$ where a = major axis and b = minor axis
 - **Range:** 0 (circle) to 1 (line)
 - **Why it matters:** High eccentricity values indicate very elongated objects—like pipes or beams.
 
@@ -150,3 +150,15 @@ Flags shape-consistent, solid, manufactured forms.
 - `eccentricity > 0.98`, `long_object = True`, `skeleton_length > 300`
 
 ---
+
+# 📋 Attribute Analysis Rationale
+
+| Attribute         | Condition(s) | Rationale |
+|--------------------|--------------|-----------|
+| **is_man_made** | solidity > 0.85 and num_corners in [3,4,6,8] OR eccentricity > 0.95 and skeleton_length > 300 | Man-made objects are typically geometrically regular or long and uniform in structure like pipes or rods. |
+| **fracture_detected** | num_defects > 5 OR num_corners > 10 OR solidity < 0.85 | High irregularity or jaggedness indicates potential cracks or deformities typical of fractured objects. |
+| **long_object** | eccentricity > 0.95 AND (aspect_ratio > 3 OR skeleton_length > 300) AND circularity < 0.4 | Long objects are thin, stretched, and not round, e.g., wires, sticks, pipes. |
+| **round_object** | circularity > 0.85 AND eccentricity < 0.6 AND solidity > 0.9 | Round, filled objects like wheels or balls are highly regular with few concavities. |
+| **compact_object** | solidity > 0.95 AND extent > 0.8 AND num_corners in [4,6] | Compact and dense shapes like boxes or bricks fill space efficiently with defined edges. |
+| **long_skeleton** | skeleton_length > 300 AND area / skeleton_length < 3 | Very long skeletons with little area indicate threadlike structures such as cables or roots. |
+| **rigid_object** | (solidity > 0.8 AND extent > 0.5 AND num_defects < 6) OR (eccentricity > 0.98 AND long_object AND skeleton_length > 300) | Rigid objects are structurally coherent and resist deformation — either compact or uniform like pipes. |
