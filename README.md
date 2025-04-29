@@ -31,7 +31,7 @@ ContourIQ uses a variety of scientifically grounded shape features to classify a
 ---
 
 ## 🔹 4. Aspect Ratio
-- **Formula:** $\frac{\text{Width} / \text{Height}}$ of the bounding box.
+- **Formula:** $\frac{\text{Width}}{\text{Height}}$ of the bounding box.
 - **Why it matters:** High ratios indicate elongated objects like sticks or rods.
 
 ---
