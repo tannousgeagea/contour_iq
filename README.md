@@ -31,25 +31,25 @@ ContourIQ uses a variety of scientifically grounded shape features to classify a
 ---
 
 ## 🔹 4. Aspect Ratio
-- **Formula:** Width / Height of the bounding box.
+- **Formula:** $\frac{\text{Width} / \text{Height}}$ of the bounding box.
 - **Why it matters:** High ratios indicate elongated objects like sticks or rods.
 
 ---
 
 ## 🔹 5. Extent
-- **Formula:** \( \frac{\text{Area}}{\text{Bounding Box Area}} \)
+- **Formula:** $ \frac{\text{Area}}{\text{Bounding Box Area}} $
 - **Why it matters:** Indicates how fully the object occupies its bounding box. Low extent often points to sparse or odd shapes.
 
 ---
 
 ## 🔹 6. Solidity
-- **Formula:** \( \frac{\text{Area}}{\text{Convex Hull Area}} \)
+- **Formula:** $ \frac{\text{Area}}{\text{Convex Hull Area}} $
 - **Why it matters:** Measures convexity. Lower values suggest more indentations or hollow regions—useful for detecting fractures.
 
 ---
 
 ## 🔹 7. Eccentricity
-- **Formula:** \( \sqrt{1 - (b/a)^2} \) where \( a = \) major axis and \( b = \) minor axis
+- **Formula:** $ \sqrt{1 - (b/a)^2} $ where $ a = $ major axis and $ b = $ minor axis
 - **Range:** 0 (circle) to 1 (line)
 - **Why it matters:** High eccentricity values indicate very elongated objects—like pipes or beams.
 
@@ -86,3 +86,67 @@ ContourIQ uses a variety of scientifically grounded shape features to classify a
 ---
 
 These features form the foundation of ContourIQ's shape intelligence pipeline, powering object classification from raw segmentation data with precision and interpretability.
+
+---
+
+# 🧠 Contour-Based Attribute Analysis in ContourIQ
+
+Beyond raw geometric features, ContourIQ intelligently derives higher-level **shape-based attributes** using heuristic rules. These attributes help interpret the **functional identity** or **structural nature** of each object.
+
+## 🔍 Defined Attributes & Logic
+
+### ✅ `is_man_made`
+Detects regularity and simplicity in shape — typical of manufactured objects.
+- `solidity > 0.85`
+- `num_corners` in [3, 4, 6, 8]  
+  **OR**
+- `eccentricity > 0.95` and `skeleton_length > 300`
+
+---
+
+### ✅ `fracture_detected`
+Flags objects with jagged or broken outlines.
+- `num_defects > 5`  
+- `num_corners > 10`  
+- `solidity < 0.85`
+
+---
+
+### ✅ `long_object`
+Catches elongated shapes like pipes or rods.
+- `eccentricity > 0.95`
+- `aspect_ratio > 3` or `skeleton_length > 300`
+- `circularity < 0.4`
+
+---
+
+### ✅ `round_object`
+Detects circular rigid bodies like wheels, balls.
+- `circularity > 0.85`
+- `eccentricity < 0.6`
+- `solidity > 0.9`
+
+---
+
+### ✅ `compact_object`
+Represents box-like, filled-in shapes.
+- `solidity > 0.95`
+- `extent > 0.8`
+- `num_corners` in [4, 6]
+
+---
+
+### ✅ `long_skeleton`
+Indicates fine, thread-like structures.
+- `skeleton_length > 300`
+- `area / skeleton_length < 3`
+
+---
+
+### ✅ `rigid_object`
+Flags shape-consistent, solid, manufactured forms.
+- `solidity > 0.8`, `extent > 0.5`, and `num_defects < 6`  
+  **OR**
+- `eccentricity > 0.98`, `long_object = True`, `skeleton_length > 300`
+
+---
