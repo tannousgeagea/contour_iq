@@ -37,19 +37,19 @@ ContourIQ uses a variety of scientifically grounded shape features to classify a
 ---
 
 ## 🔹 5. Extent
-- **Formula:** $ \frac{\text{Area}}{\text{Bounding Box Area}} $
+- **Formula:** $\frac{\text{Area}}{\text{Bounding Box Area}}$
 - **Why it matters:** Indicates how fully the object occupies its bounding box. Low extent often points to sparse or odd shapes.
 
 ---
 
 ## 🔹 6. Solidity
-- **Formula:** $ \frac{\text{Area}}{\text{Convex Hull Area}} $
+- **Formula:** $\frac{\text{Area}}{\text{Convex Hull Area}}$
 - **Why it matters:** Measures convexity. Lower values suggest more indentations or hollow regions—useful for detecting fractures.
 
 ---
 
 ## 🔹 7. Eccentricity
-- **Formula:** $ \sqrt{1 - (b/a)^2} $ where $ a = $ major axis and $ b = $ minor axis
+- **Formula:** $\sqrt{1 - (b/a)^2}$ where $ a = $ major axis and $ b = $ minor axis
 - **Range:** 0 (circle) to 1 (line)
 - **Why it matters:** High eccentricity values indicate very elongated objects—like pipes or beams.
 
