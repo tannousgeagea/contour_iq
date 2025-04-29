@@ -149,7 +149,6 @@ Flags shape-consistent, solid, manufactured forms.
   **OR**
 - `eccentricity > 0.98`, `long_object = True`, `skeleton_length > 300`
 
----
 
 # 📋 Attribute Analysis Rationale
 
