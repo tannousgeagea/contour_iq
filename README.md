@@ -24,7 +24,7 @@ ContourIQ uses a variety of scientifically grounded shape features to classify a
 ---
 
 ## 🔹 3. Circularity
-- **Formula:** \( \frac{4 \cdot \pi \cdot \text{Area}}{\text{Perimeter}^2} \)
+- **Formula:** $\frac{4 \cdot \pi \cdot \text{Area}}{\text{Perimeter}^2}$
 - **Range:** [0, 1], with 1 representing a perfect circle.
 - **Why it matters:** Distinguishes round objects (e.g., wheels, balls) from angular or irregular ones.
 
