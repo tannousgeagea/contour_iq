@@ -3,12 +3,14 @@ import cv2
 from PIL import Image 
 from typing import List, Dict, Union
 import numpy as np
-
+from common_utils.time_tracker.core import KeepTrackOfTime
 from pipeline.tasks.preprocessing import preprocess_segmentation
 from pipeline.tasks.contour_extraction import extract_all_contours
 from pipeline.tasks.feature_extraction import extract_shape_features
 from pipeline.tasks.analysis import analyze_contour
 from pipeline.tasks.annotation import annotate_image
+
+keep_track_of_time = KeepTrackOfTime()
 
 def render_individual_features(image: np.ndarray, contours: List[np.ndarray], feature_list: List[Dict[str, float]]) -> List[np.ndarray]:
     """
@@ -39,7 +41,8 @@ def render_individual_features(image: np.ndarray, contours: List[np.ndarray], fe
 
 def run_contour_pipeline(
         image: np.ndarray, 
-        segments: List[Union[np.ndarray, List[tuple]]]
+        segments: List[Union[np.ndarray, List[tuple]]],
+        render_individual:bool=False,
         ) -> Dict[str, Union[np.ndarray, List[Dict[str, Union[float, bool]]]]]:
     """
     Full pipeline to analyze object contours from a segmented image.
@@ -53,24 +56,39 @@ def run_contour_pipeline(
         'annotated_image': Annotated image with overlays
         'results': List of feature + attribute dicts for each object
     """
+
+    keep_track_of_time.start()
     masks = preprocess_segmentation(image, segments)
+    keep_track_of_time.end()
+    keep_track_of_time.log(prefix="Preprocissing Time")
+
+    keep_track_of_time.start()
     all_contours = extract_all_contours(masks)
+    keep_track_of_time.end()
+    keep_track_of_time.log(prefix="Extract contour Time")
 
     all_features = []
     all_attributes = []
     flat_contours = []
 
+    keep_track_of_time.start()
     for i, contours in enumerate(all_contours):
         for contour in contours:
+            keep_track_of_time.start()
             features = extract_shape_features(contour, mask_shape=image.shape[:2])
             attributes = analyze_contour(features)
 
             all_features.append({**features, **attributes})
             all_attributes.append(attributes)
             flat_contours.append(contour)
+            keep_track_of_time.end()
+            keep_track_of_time.log(prefix="Per-Contour Feature Extraction")
+
+    keep_track_of_time.end()
+    keep_track_of_time.log(prefix="Feature Extraction")
 
     annotated = annotate_image(image, flat_contours, all_attributes)
-    individual_images = render_individual_features(image, flat_contours, all_features)
+    individual_images = render_individual_features(image, flat_contours, all_features) if render_individual else []
 
     return {
         "annotated_image": annotated,

@@ -3,6 +3,13 @@ import numpy as np
 from typing import Dict
 from skimage.morphology import skeletonize
 from scipy.fft import fft
+from common_utils.features import (
+    contour_area,
+    contour_perimeter,
+    contour_circularity,
+    contour_aspect_ratio,
+    contour_extent,
+)
 
 def extract_shape_features(contour: np.ndarray, mask_shape: tuple = None) -> Dict[str, float]:
     """
@@ -17,20 +24,15 @@ def extract_shape_features(contour: np.ndarray, mask_shape: tuple = None) -> Dic
     features = {}
 
     # Area and perimeter
-    area = cv2.contourArea(contour)
-    perimeter = cv2.arcLength(contour, True)
-
+    area = contour_area(contour)
+    perimeter = contour_perimeter(contour)
+    x, y, w, h = cv2.boundingRect(contour)
     # Shape descriptors
     features["area"] = area
     features["perimeter"] = perimeter
-    features["circularity"] = (4 * np.pi * area) / (perimeter ** 2) if perimeter > 0 else 0
-
-    # Bounding box and aspect ratio
-    x, y, w, h = cv2.boundingRect(contour)
-    features["aspect_ratio"] = float(w) / h if h > 0 else 0
-
-    # Extent (object area / bounding box area)
-    features["extent"] = area / (w * h) if w * h > 0 else 0
+    features["circularity"] = contour_circularity(contour, perimeter, area)
+    features["aspect_ratio"] = contour_aspect_ratio(w=w, h=h)
+    features["extent"] = contour_extent(contour_area=area, w=w, h=h)
 
     # Solidity (area / convex hull area)
     hull = cv2.convexHull(contour)

@@ -31,7 +31,6 @@ def main(image_path, model, output_dir=".", debug=False):
     cv_image = cv2.cvtColor(output["annotated_image"], cv2.COLOR_BGR2RGB)
     pil_image = Image.fromarray(cv_image)
     pil_image.save(f"{output_dir}/{os.path.basename(image_path)}", format="JPEG", quality=60, optimize=True)
-    # cv2.imwrite(f"{output_dir}/{os.path.basename(image_path)}", output["annotated_image"])
 
     if debug:
         os.makedirs(f"{output_dir}/{os.path.basename(image_path).split('.jpg')[0]}", exist_ok=True)
@@ -40,17 +39,16 @@ def main(image_path, model, output_dir=".", debug=False):
             cv_image = cv2.cvtColor(obj_img, cv2.COLOR_BGR2RGB)
             pil_image = Image.fromarray(cv_image) 
             pil_image.save(f"{output_dir}/{os.path.basename(image_path).split('.jpg')[0]}/object_{i+1}_features.png", format='JPEG', quality=60, optimize=True)
-            # cv2.imwrite(f"{output_dir}/{os.path.basename(image_path).split('.jpg')[0]}/object_{i+1}_features.png", obj_img)
 
 if __name__ == "__main__":
-    model = YOLO('/media/base.segment.pt')
+    model = YOLO('/media/amk.front.segmentation.v1.pt')
 
-    images = glob("/media/AGR/images_g1/processed/*.jpg")
+    images = glob("/media/AMK_front/images_g3/processed/*.jpg")
     pbar = tqdm(images, ncols=125)
     for image in pbar:
         main(
             image_path=image, 
             model=model,
-            output_dir="/media/debug/AGR",
+            output_dir="/media/debug/AMK",
             debug=False
         )
