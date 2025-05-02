@@ -2,7 +2,7 @@ services:
   # computing unit
   contourIQ:
     shm_size: '2gb'
-    image: tannousgeagea/contouriq:ubuntu.20.04-cuda.11.5.2
+    image: tannousgeagea/contouriq:latest
     container_name: contourIQ
     stdin_open: true # docker run -i
     tty: true        # docker run -t

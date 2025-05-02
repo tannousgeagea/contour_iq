@@ -13,6 +13,9 @@ def yolo_segmentation_to_masks(results, image_shape):
     Extract and resize YOLOv8 segmentation masks to match the input image shape.
     """
     segments = []
+    if results[0].masks is None:
+        return segments
+    
     for mask in results[0].masks.data:  # Each mask is [h, w] tensor
         binary_mask = mask.cpu().numpy().astype(np.uint8) * 255
         resized_mask = cv2.resize(binary_mask, (image_shape[1], image_shape[0]), interpolation=cv2.INTER_NEAREST)
@@ -25,7 +28,7 @@ def main(image_path, model, output_dir=".", debug=False):
     # Run the model
     results = model(image)
     segments = yolo_segmentation_to_masks(results, image.shape)
-    output = run_contour_pipeline(image, segments)
+    output = run_contour_pipeline(image, segments, render_individual=True)
     os.makedirs(f"{output_dir}", exist_ok=True)
     
     cv_image = cv2.cvtColor(output["annotated_image"], cv2.COLOR_BGR2RGB)
@@ -43,12 +46,12 @@ def main(image_path, model, output_dir=".", debug=False):
 if __name__ == "__main__":
     model = YOLO('/media/amk.front.segmentation.v1.pt')
 
-    images = glob("/media/AMK_front/images_g3/processed/*.jpg")
+    images = glob("/media/AMK_front/*.jpg")
     pbar = tqdm(images, ncols=125)
     for image in pbar:
         main(
             image_path=image, 
             model=model,
-            output_dir="/media/debug/AMK",
-            debug=False
+            output_dir="/media/debug/AMK_front",
+            debug=True,
         )

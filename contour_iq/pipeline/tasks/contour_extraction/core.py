@@ -1,6 +1,8 @@
+import os
 import cv2
 import numpy as np
 from typing import List
+from concurrent.futures import ThreadPoolExecutor
 
 def extract_contours(mask: np.ndarray) -> List[np.ndarray]:
     """
@@ -15,9 +17,9 @@ def extract_contours(mask: np.ndarray) -> List[np.ndarray]:
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     return contours
 
-def extract_all_contours(masks: List[np.ndarray]) -> List[List[np.ndarray]]:
+def extract_all_contours(masks: List[np.ndarray], max_workers:int=None) -> List[List[np.ndarray]]:
     """
-    Extracts contours for a list of binary masks.
+    Extracts contours for a list of binary masks using parallel processing.
 
     Parameters:
     - masks: List of binary masks.
