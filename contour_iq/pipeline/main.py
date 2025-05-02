@@ -57,36 +57,41 @@ def run_contour_pipeline(
         'results': List of feature + attribute dicts for each object
     """
 
-    keep_track_of_time.start()
-    masks = preprocess_segmentation(image, segments)
-    keep_track_of_time.end()
-    keep_track_of_time.log(prefix="Preprocissing Time")
+    keep_track_of_time.start(task="run_pipeline")
 
-    keep_track_of_time.start()
+    keep_track_of_time.start(task='preprocessing')
+    masks = preprocess_segmentation(image, segments)
+    keep_track_of_time.end(task='preprocessing')
+
+    keep_track_of_time.start(task='extract_contour')
     all_contours = extract_all_contours(masks)
-    keep_track_of_time.end()
-    keep_track_of_time.log(prefix="Extract contour Time")
+    keep_track_of_time.end(task='extract_contour')
 
     all_features = []
     all_attributes = []
     flat_contours = []
 
-    keep_track_of_time.start()
+    keep_track_of_time.start(task='extract_feature')
     for i, contours in enumerate(all_contours):
         for contour in contours:
-            keep_track_of_time.start()
+            keep_track_of_time.start(task='extract_feature_per_contour')
             features = extract_shape_features(contour, mask_shape=image.shape[:2])
             attributes = analyze_contour(features)
 
             all_features.append({**features, **attributes})
             all_attributes.append(attributes)
             flat_contours.append(contour)
-            keep_track_of_time.end()
-            keep_track_of_time.log(prefix="Per-Contour Feature Extraction")
+            keep_track_of_time.end(task='extract_feature_per_contour')
+            keep_track_of_time.log(task='extract_feature_per_contour', prefix="Per-Contour Feature Extraction")
+    keep_track_of_time.end(task='extract_feature')
 
-    keep_track_of_time.end()
-    keep_track_of_time.log(prefix="Feature Extraction")
+    keep_track_of_time.log(task='preprocessing', prefix="Preprocissing Time")
+    keep_track_of_time.log(task='extract_contour', prefix="Extract contour Time")
+    keep_track_of_time.log(task='extract_feature', prefix="Feature Extraction")
 
+    keep_track_of_time.end(task="run_pipeline")
+    keep_track_of_time.log(task="run_pipeline", prefix="Total Execution Time")
+    
     annotated = annotate_image(image, flat_contours, all_attributes)
     individual_images = render_individual_features(image, flat_contours, all_features) if render_individual else []
 
