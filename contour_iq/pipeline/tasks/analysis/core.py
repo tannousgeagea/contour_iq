@@ -9,13 +9,13 @@ def analyze_contour(features: Dict[str, float]) -> Dict[str, bool]:
     - Dictionary with high-level attributes.
     """
     attributes = {
-        "is_man_made": False,
-        "fracture_detected": False,
-        "long_object": False,
-        "round_object": False,
-        "compact_object": False,
+        "manmade": False,
+        "fractured": False,
+        "long": False,
+        "round": False,
+        "compact": False,
         "long_skeleton": False,
-        "rigid_object": False,
+        "rigid": False,
     }
 
     # Heuristic for man-made object:
@@ -28,7 +28,7 @@ def analyze_contour(features: Dict[str, float]) -> Dict[str, bool]:
             features.get("skeleton_length", 0) > 300
         )
     ):
-        attributes["is_man_made"] = True
+        attributes["manmade"] = True
 
     if (
         features.get("num_defects", 0) > 5 or
@@ -36,21 +36,21 @@ def analyze_contour(features: Dict[str, float]) -> Dict[str, bool]:
         features.get("skeleton_length", 0) > 200 or
         features.get("eccentricity", 0) > 0.95
     ):
-        attributes["fracture_detected"] = True
+        attributes["fractured"] = True
 
     if (
         features.get("eccentricity", 0) > 0.95 and
         (features.get("aspect_ratio", 0) > 3 or features.get("skeleton_length", 0) > 300) and
         features.get("circularity", 0) < 0.4
     ):
-        attributes["long_object"] = True
+        attributes["long"] = True
 
     if (
         features.get("circularity", 0) > 0.65 and
         features.get("eccentricity", 0) < 0.6 and
         features.get("solidity", 0) > 0.9
     ):
-        attributes["round_object"] = True
+        attributes["round"] = True
 
     # Compact convex object (box, brick)
     if (
@@ -58,7 +58,7 @@ def analyze_contour(features: Dict[str, float]) -> Dict[str, bool]:
         features.get("extent", 0) > 0.8 and
         features.get("num_corners", 0) in [4, 6]
     ):
-        attributes["compact_object"] = True
+        attributes["compact"] = True
 
     # Long skeleton
     if (
@@ -67,9 +67,9 @@ def analyze_contour(features: Dict[str, float]) -> Dict[str, bool]:
     ):
         attributes["long_skeleton"] = True
 
-    attributes["rigid_object"] = (
+    attributes["rigid"] = (
         (features.get("solidity") > 0.85 and features.get("extent") > 0.85 and features.get("num_defects") <= 2) or
-        (features.get("eccentricity", 0) > 0.98 and attributes['long_object'] and features.get("skeleton_length", 0) > 300)
+        (features.get("eccentricity", 0) > 0.98 and attributes['long'] and features.get("skeleton_length", 0) > 300)
     )
 
     return attributes

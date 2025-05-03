@@ -81,6 +81,7 @@ def run_contour_pipeline(
             all_features.append({**features, **attributes})
             all_attributes.append(attributes)
             flat_contours.append(contour)
+
             keep_track_of_time.end(task='extract_feature_per_contour')
             keep_track_of_time.log(task='extract_feature_per_contour', prefix="Per-Contour Feature Extraction")
     keep_track_of_time.end(task='extract_feature')
@@ -96,8 +97,10 @@ def run_contour_pipeline(
     individual_images = render_individual_features(image, flat_contours, all_features) if render_individual else []
 
     return {
+        "contours": flat_contours,
         "annotated_image": annotated,
         "results": all_features,
+        "attributes": all_attributes,
         "object_images": individual_images
     }
 
