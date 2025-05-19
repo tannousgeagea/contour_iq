@@ -24,8 +24,13 @@ def analyze_contour(features: Dict[str, float]) -> Dict[str, bool]:
             features.get("solidity", 0) > 0.85 and
             features.get("num_corners", 0) in [3, 4, 6, 8, 10, 12]
         ) or (
-            features.get("eccentricity", 0) > 0.95 and
+            features.get("eccentricity", 0) > 0.8 and
             features.get("skeleton_length", 0) > 300
+        ) or (
+            features.get("solidity", 0) > 0.75 and
+            features.get("area", 0) > 5000 and
+            features.get("skeleton_length", 0) > 300 and
+            features.get("num_corners", 0) >= 4
         )
     ):
         attributes["manmade"] = True
@@ -39,9 +44,9 @@ def analyze_contour(features: Dict[str, float]) -> Dict[str, bool]:
         attributes["fractured"] = True
 
     if (
-        features.get("eccentricity", 0) > 0.95 and
+        features.get("eccentricity", 0) > 0.8 and
         (features.get("aspect_ratio", 0) > 3 or features.get("skeleton_length", 0) > 300) and
-        features.get("circularity", 0) < 0.4
+        features.get("circularity", 0) < 0.65
     ):
         attributes["long"] = True
 
@@ -68,8 +73,15 @@ def analyze_contour(features: Dict[str, float]) -> Dict[str, bool]:
         attributes["long_skeleton"] = True
 
     attributes["rigid"] = (
-        (features.get("solidity") > 0.85 and features.get("extent") > 0.85 and features.get("num_defects") <= 2) or
-        (features.get("eccentricity", 0) > 0.98 and attributes['long'] and features.get("skeleton_length", 0) > 300)
+        (features.get("solidity") > 0.85 and features.get("extent") > 0.8 and features.get("num_defects") <= 6) or
+        (features.get("eccentricity", 0) > 0.8 and attributes['long'] and features.get("skeleton_length", 0) > 300) or
+        (
+            features.get("solidity", 0) > 0.75 and
+            features.get("area", 0) > 5000 and
+            features.get("skeleton_length", 0) > 300 and
+            features.get("extent", 0) > 0.5 and
+            features.get("num_defects", 0) <= 12
+        )
     )
 
     return attributes

@@ -44,14 +44,41 @@ def main(image_path, model, output_dir=".", debug=False):
             pil_image.save(f"{output_dir}/{os.path.basename(image_path).split('.jpg')[0]}/object_{i+1}_features.png", format='JPEG', quality=60, optimize=True)
 
 if __name__ == "__main__":
-    model = YOLO('/media/amk.front.segmentation.v1.pt')
+    # model = YOLO('/media/amk.front.segmentation.v1.pt')
 
-    images = glob("/media/AMK_front/*.jpg")
-    pbar = tqdm(images, ncols=125)
-    for image in pbar:
-        main(
-            image_path=image, 
-            model=model,
-            output_dir="/media/debug/AMK_front",
-            debug=True,
-        )
+    # images = glob("/media/AMK_front/*.jpg")
+    # pbar = tqdm(images, ncols=125)
+    # for image in pbar:
+    #     main(
+    #         image_path=image, 
+    #         model=model,
+    #         output_dir="/media/debug/AMK_front",
+    #         debug=True,
+    #     )
+
+
+    import json
+    import requests
+
+    data = json.load(open("/home/appuser/src/contour_iq/polygons.json", "r"))
+    
+    polygons = data["polygons"]
+
+    payload = {
+        "input_shape": [2048, 2448, 3],
+        "contours": polygons,
+        "thresholds": [
+            {
+                "name": "",
+                "value": 0
+            }
+        ]
+    }
+
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json"
+    }
+    response = requests.post("http://localhost:9095/api/v1/analyze_contours", json=payload, headers=headers)
+    response.raise_for_status()
+    print(response.json())
